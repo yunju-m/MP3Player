@@ -9,5 +9,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="imgs"/>
 	<classpathentry kind="src" path="wav"/>
+	<classpathentry kind="src" path="lyrics"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
