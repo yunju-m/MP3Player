@@ -2,24 +2,24 @@ package mp3;
 
 public class MP3Player {
 
-	private int uid;
+	private int uno;
 	private String uname;
 
 	public MP3Player() {
 	}
 
-	public MP3Player(int uid, String uname) {
+	public MP3Player(int uno, String uname) {
 		super();
-		this.uid = uid;
+		this.uno = uno;
 		this.uname = uname;
 	}
 
-	public int getUid() {
-		return uid;
+	public int getuno() {
+		return uno;
 	}
 
-	public void setUid(int uid) {
-		this.uid = uid;
+	public void setuno(int uno) {
+		this.uno = uno;
 	}
 
 	public String getUname() {
@@ -32,7 +32,7 @@ public class MP3Player {
 
 	@Override
 	public String toString() {
-		return "MP3Player [uid=" + uid + ", uname=" + uname + "]";
+		return "MP3Player [uno=" + uno + ", uname=" + uname + "]";
 	}
 
 }
