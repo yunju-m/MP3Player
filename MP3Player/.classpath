@@ -7,5 +7,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jdbc"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="imgs"/>
+	<classpathentry kind="src" path="wav"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
