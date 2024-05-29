@@ -33,6 +33,7 @@ public class MP3PlayerGUI extends JFrame {
 
 	public static final long serialVersionUID = 4238230498209348L;
 
+	JButton beforeBtn;
 	JTextField filePathField;
 	JButton playButton;
 	JButton stopButton;
@@ -84,11 +85,25 @@ public class MP3PlayerGUI extends JFrame {
 		JPanel topPanel = new JPanel();
 		JLabel musicTitle = new JLabel(music.getMtitle());
 		JLabel musicAutor = new JLabel(music.getMautor());
+		beforeBtn = new JButton("◀");
 
+		topPanel.add(beforeBtn, BorderLayout.WEST);
 		topPanel.add(musicTitle);
 		topPanel.add(musicAutor);
 		topPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
 		add(topPanel, BorderLayout.NORTH);
+
+		clickBeforeBtn();
+	}
+
+	private void clickBeforeBtn() {
+		beforeBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new MP3PlayListGUI().startMP3PlayListGUI();;
+				setVisible(false);
+			}
+		});
 	}
 
 	// IMG 화면 구현 (크기조절을 위해 Image변환 후 icon재설정)
