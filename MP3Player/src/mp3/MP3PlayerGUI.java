@@ -36,7 +36,7 @@ public class MP3PlayerGUI extends JFrame {
 	JTextField filePathField;
 	JButton playButton;
 	JButton stopButton;
-	JPanel centerPanel;	// 노래 이미지, 가사 영역
+	JPanel centerPanel; // 노래 이미지, 가사 영역
 	JTextField lyricsField; // 가사 출력 영역
 
 	Color backgroundColor = new Color(240, 240, 240); // 배경색
@@ -46,16 +46,19 @@ public class MP3PlayerGUI extends JFrame {
 	Font buttonFont = new Font("Malgun Gothic", Font.BOLD, 12); // 버튼 텍스트 폰트
 
 	MP3Dao mdao;
+	Music music;
 	private Clip clip;
 	private boolean isPlaying = false;
 
-	public MP3PlayerGUI() {
-		mdao = new MP3Dao();
-		init();
-	}
-
-	public void startMP3PlayerGUI() {
-		SwingUtilities.invokeLater(() -> setVisible(true));	
+	public MP3PlayerGUI(int mid) {
+		try {
+			SwingUtilities.invokeLater(() -> setVisible(true));
+			mdao = new MP3Dao();
+			music = mdao.getMusic(mid);
+			init();
+		} catch (SQLException sqle) {
+			sqle.printStackTrace();
+		}
 	}
 
 	private void init() {
@@ -65,9 +68,6 @@ public class MP3PlayerGUI extends JFrame {
 
 		try {
 			// 현재 뮤직의 정보를 가져온다.
-			// 임의로 1이라고 지정
-			Music music = mdao.getMusic(1);
-
 			showMusicTitlePanel(music);
 			showMusicImgPanel(music);
 			showMusiclyricsPanel(music);
@@ -87,7 +87,7 @@ public class MP3PlayerGUI extends JFrame {
 
 		topPanel.add(musicTitle);
 		topPanel.add(musicAutor);
-		topPanel.setBorder(BorderFactory.createEmptyBorder(30 , 0 , 0 , 0));
+		topPanel.setBorder(BorderFactory.createEmptyBorder(30, 0, 0, 0));
 		add(topPanel, BorderLayout.NORTH);
 	}
 
@@ -102,23 +102,22 @@ public class MP3PlayerGUI extends JFrame {
 
 		JPanel imgPanel = new JPanel();
 		imgPanel.add(lb1);
-		centerPanel = new JPanel(new BorderLayout());	// centerPanel을 BorderLayout으로 기준을 잡음
+		centerPanel = new JPanel(new BorderLayout()); // centerPanel을 BorderLayout으로 기준을 잡음
 		centerPanel.add(imgPanel, BorderLayout.NORTH);
 	}
 
 	// 가사 화면 구현
 	private void showMusiclyricsPanel(Music music) {
 		// 가사 영역 생성
-		JTextArea lyricsArea = new JTextArea();	
+		JTextArea lyricsArea = new JTextArea();
 		lyricsArea.setEditable(false);
 		String lyrics = readLyricFile(music.getMlyrics());
 		lyricsArea.setText(lyrics);
 
 		// 가사 영역에 스크롤바 생성
-		JScrollPane scrollPane = new JScrollPane(lyricsArea, 
-				ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+		JScrollPane scrollPane = new JScrollPane(lyricsArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBorder(BorderFactory.createEmptyBorder(0 , 90 , 0 , 90));
+		scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 90, 0, 90));
 		centerPanel.add(scrollPane, BorderLayout.CENTER);
 		add(centerPanel, BorderLayout.CENTER);
 
@@ -161,7 +160,6 @@ public class MP3PlayerGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				if (!isPlaying) {
 					try {
-						System.out.println("노래시작");
 						FileInputStream fileInputStream = new FileInputStream(music.getMfile());
 						BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
 						clip = AudioSystem.getClip();

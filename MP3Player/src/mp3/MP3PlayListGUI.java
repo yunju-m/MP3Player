@@ -34,7 +34,7 @@ public class MP3PlayListGUI extends JFrame {
 		init();
 	}
 
-	public static void main(String[] args) {
+	public void startMP3PlayListGUI() {
 		SwingUtilities.invokeLater(() -> new MP3PlayListGUI().setVisible(true));	
 	}
 
@@ -90,8 +90,11 @@ public class MP3PlayListGUI extends JFrame {
 			musicContentPanel.setBorder(BorderFactory.createEmptyBorder(20 , 0 , 20 , 0));
 
 			playBtn = new JButton("재생");
+			playBtn.setActionCommand("" + music.getMid());
 			deleteBtn = new JButton("삭제");
-			deleteBtn.setActionCommand(""+music.getMid());
+			deleteBtn.setActionCommand("" + music.getMid());
+
+			clickPlayMusicBtn();
 			clickDelMusicBtn();
 
 			playMusicPanel.add(getMusicImgLabel(music));
@@ -175,6 +178,17 @@ public class MP3PlayListGUI extends JFrame {
 			}
 		}
 		mdao.insertMusicSql(music);
+	}
+
+	// 노래시작버튼 클릭시 MP3PlayerGUI로 이동
+	private void clickPlayMusicBtn() {
+		playBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new MP3PlayerGUI(Integer.parseInt(e.getActionCommand()));
+				setVisible(false);
+			}
+		});
 	}
 
 	// 노래삭제버튼 클릭시 해당 노래 플레이리스트에서 삭제
