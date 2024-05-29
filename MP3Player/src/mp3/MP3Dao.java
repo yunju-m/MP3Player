@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MP3Dao {
 
@@ -21,24 +23,27 @@ public class MP3Dao {
 
 	// 전체 뮤직리스트 메소드
 	public List<Music> getMusicList() throws SQLException {
-		String sql = " SELECT * FROM MUSIC ORDER BY MID ";
+		String sql = " SELECT * FROM MUSIC ";
 		stmt = conn.createStatement();
 		rs = stmt.executeQuery(sql);
 
 		List<Music> musicList = new ArrayList<Music>();
+		
 		while (rs.next()) {
-			Music mp3 = new Music(rs.getInt("MID"), rs.getString("MTITLE"), rs.getString("MAUTOR"),
-					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGenreList());
-			musicList.add(mp3);
+			int mid = rs.getInt("MID");
+			Music music = new Music(mid, rs.getString("MTITLE"), rs.getString("MAUTOR"),
+					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), null);
+			musicList.add(music);
 		}
 		return musicList;
 	}
 	
 	// 뮤직 장르 반환 메소드
-	public List<MusicGenre> getMusicGenreList() throws SQLException {
-		String sql = " SELECT * FROM MUSICGENRE ORDER BY MGID ";
-		stmt = conn.createStatement();
-		rs = stmt.executeQuery(sql);
+	public List<MusicGenre> getMusicGenreList(int mgid) throws SQLException {
+		String sql = " SELECT * FROM MUSICGENRE WHERE MGID=? ORDER BY MGID ";
+		pstmt = conn.prepareStatement(sql);
+		pstmt.setInt(1, mgid);
+		rs = pstmt.executeQuery();
 		
 		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
 		while (rs.next()) {
@@ -58,7 +63,7 @@ public class MP3Dao {
 		Music music = null;
 		if (rs.next()) {
 			music = new Music(rs.getInt("MID"), rs.getString("MTITLE"), rs.getString("MAUTOR"),
-					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGenreList());
+					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), null);
 		}
 		return music;
 	}
