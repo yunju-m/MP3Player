@@ -28,15 +28,15 @@ public class MP3Dao {
 		List<Music> musicList = new ArrayList<Music>();
 		while (rs.next()) {
 			Music mp3 = new Music(rs.getInt("MID"), rs.getString("MTITLE"), rs.getString("MAUTOR"),
-					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGanreList());
+					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGenreList());
 			musicList.add(mp3);
 		}
 		return musicList;
 	}
 	
 	// 뮤직 장르 반환 메소드
-	public List<MusicGenre> getMusicGanreList() throws SQLException {
-		String sql = " SELECT * FROM MUSICGANRE ORDER BY MGID ";
+	public List<MusicGenre> getMusicGenreList() throws SQLException {
+		String sql = " SELECT * FROM MUSICGENRE ORDER BY MGID ";
 		stmt = conn.createStatement();
 		rs = stmt.executeQuery(sql);
 		
@@ -58,7 +58,7 @@ public class MP3Dao {
 		Music music = null;
 		if (rs.next()) {
 			music = new Music(rs.getInt("MID"), rs.getString("MTITLE"), rs.getString("MAUTOR"),
-					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGanreList());
+					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), getMusicGenreList());
 		}
 		return music;
 	}
