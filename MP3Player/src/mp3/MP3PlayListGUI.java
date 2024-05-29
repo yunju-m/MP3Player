@@ -26,6 +26,8 @@ public class MP3PlayListGUI extends JFrame {
 	MP3Dao mdao;
 	JPanel topPanel;
 	JButton addMusicBtn;
+	JButton playBtn;
+	JButton deleteBtn;
 
 	public MP3PlayListGUI() {
 		mdao = new MP3Dao();
@@ -87,8 +89,10 @@ public class MP3PlayListGUI extends JFrame {
 			musicContentPanel.add(musicAutor, BorderLayout.SOUTH);
 			musicContentPanel.setBorder(BorderFactory.createEmptyBorder(20 , 0 , 20 , 0));
 
-			JButton playBtn = new JButton("재생");
-			JButton deleteBtn = new JButton("삭제");
+			playBtn = new JButton("재생");
+			deleteBtn = new JButton("삭제");
+			deleteBtn.setActionCommand(""+music.getMid());
+			clickDelMusicBtn();
 
 			playMusicPanel.add(getMusicImgLabel(music));
 			playMusicPanel.add(musicContentPanel);
@@ -171,6 +175,20 @@ public class MP3PlayListGUI extends JFrame {
 			}
 		}
 		mdao.insertMusicSql(music);
+	}
+
+	// 노래삭제버튼 클릭시 해당 노래 플레이리스트에서 삭제
+	private void clickDelMusicBtn() {
+		deleteBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					mdao.deleteMusicSql(Integer.parseInt(e.getActionCommand()));
+				} catch (SQLException sqle) {
+					sqle.printStackTrace();
+				}
+			}
+		});
 	}
 
 }
