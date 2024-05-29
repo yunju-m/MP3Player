@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
-public class MP3GUI extends JFrame {
+public class MP3PlayerGUI extends JFrame {
 
 	public static final long serialVersionUID = 4238230498209348L;
 
@@ -29,12 +29,12 @@ public class MP3GUI extends JFrame {
 	private Clip clip;
 	private boolean isPlaying = false;
 
-	public MP3GUI() {
+	public MP3PlayerGUI() {
 		init();
 	}
-
-	public static void main(String[] args) {
-		SwingUtilities.invokeLater(() -> new MP3GUI().setVisible(true));	
+	
+	public void startMP3PlayerGUI() {
+		SwingUtilities.invokeLater(() -> setVisible(true));	
 	}
 
 	private void init() {
@@ -52,6 +52,7 @@ public class MP3GUI extends JFrame {
 
 	// 노래 제목 화면 구현
 	private void showMusicTitlePanel() {
+		System.out.println("노래 제목 화면 구현");
 		JPanel topPanel = new JPanel();
 		JLabel musicTitle = new JLabel("노래제목");
 		JLabel musicAutor = new JLabel("작곡가");
@@ -63,6 +64,7 @@ public class MP3GUI extends JFrame {
 
 	// IMG 화면 구현 (크기조절을 위해 Image변환 후 icon재설정)
 	private void showMusicImgPanel() {
+		System.out.println("IMG 화면 구현");
 		ImageIcon icon = new ImageIcon("imgs/B_좋은날.jpg");
 		Image img = icon.getImage();
 		Image changeImg = img.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
@@ -77,6 +79,7 @@ public class MP3GUI extends JFrame {
 
 	// 노래 재생, 정지 버튼 화면 구현
 	private void showMusicBtnPanel() {
+		System.out.println("노래 재생, 정지 버튼 화면 구현");
 		JPanel bottomPanel = new JPanel();
 		filePathField = new JTextField(20);
 		playButton = new JButton("Play");
