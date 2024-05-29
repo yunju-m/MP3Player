@@ -6,9 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MP3Dao {
 
@@ -28,7 +26,7 @@ public class MP3Dao {
 		rs = stmt.executeQuery(sql);
 
 		List<Music> musicList = new ArrayList<Music>();
-		
+
 		while (rs.next()) {
 			int mid = rs.getInt("MID");
 			Music music = new Music(mid, rs.getString("MTITLE"), rs.getString("MAUTOR"),
@@ -37,14 +35,28 @@ public class MP3Dao {
 		}
 		return musicList;
 	}
-	
+
 	// 뮤직 장르 반환 메소드
+	public List<MusicGenre> getMusicGenreList() throws SQLException {
+		String sql = " SELECT * FROM MUSICGENRE ORDER BY MGID ";
+		stmt = conn.createStatement();
+		rs = stmt.executeQuery(sql);
+
+		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
+		while (rs.next()) {
+			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
+			mgtypeList.add(mgtype);
+		}
+		return mgtypeList;
+	}
+
+	// 뮤직 장르 반환 메소드 (mgid)
 	public List<MusicGenre> getMusicGenreList(int mgid) throws SQLException {
-		String sql = " SELECT * FROM MUSICGENRE WHERE MGID=? ORDER BY MGID ";
+		String sql = " SELECT * FROM MUSICGENRE WHERE MGID = ? ORDER BY MGID ";
 		pstmt = conn.prepareStatement(sql);
 		pstmt.setInt(1, mgid);
 		rs = pstmt.executeQuery();
-		
+
 		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
 		while (rs.next()) {
 			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
@@ -68,14 +80,18 @@ public class MP3Dao {
 		return music;
 	}
 
-	// 새로운 뮤직 등록(제목, 작곡가, 음악파일) 메소드
+	// 새로운 뮤직 등록(제목, 작곡가, 음악파일, 음악가사) 메소드
 	public void insertMusicSql(Music music) throws SQLException {
-		String sql = " INSERT INTO MUSIC VALUES(SEQ_MUSIC.NEXTVAL, ?, ?, ?) ";
+		String sql = " INSERT INTO MUSIC(mid, mtitle, mautor, mlyrics, mfile, mgid) VALUES(SEQ_MUSIC.NEXTVAL, ?, ?, ?, ?, ?) ";
 		pstmt = conn.prepareStatement(sql);
-		pstmt.setString(1, music.getMtitle());
-		pstmt.setString(2, music.getMautor());
-		pstmt.setString(3, music.getMfile());
-		pstmt.executeQuery();
+		for (MusicGenre mgtype : music.getMusicGenreList()) {
+			pstmt.setString(1, music.getMtitle());
+			pstmt.setString(2, music.getMautor());
+			pstmt.setString(3, music.getMlyrics());
+			pstmt.setString(4, music.getMfile());
+			pstmt.setInt(5, mgtype.getMgid());
+			pstmt.executeQuery();
+		}
 	}
 
 	// 뮤직 업데이트 메소드

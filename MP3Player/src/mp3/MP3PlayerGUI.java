@@ -127,11 +127,9 @@ public class MP3PlayerGUI extends JFrame {
 	// 노래 재생, 정지 버튼 화면 구현
 	private void showMusicBtnPanel() {
 		JPanel bottomPanel = new JPanel();
-		//		filePathField = new JTextField(20);
 		playButton = new JButton("Play");
 		stopButton = new JButton("Stop");
 
-		//		bottomPanel.add(filePathField);
 		bottomPanel.add(playButton);
 		bottomPanel.add(stopButton);
 		add(bottomPanel, BorderLayout.SOUTH);
