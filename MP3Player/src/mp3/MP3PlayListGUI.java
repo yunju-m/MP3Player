@@ -58,6 +58,7 @@ public class MP3PlayListGUI extends JFrame {
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
+
 	}
 
 	// MyPlayList텍스트, 노래추가버튼 추가 함수
@@ -113,7 +114,7 @@ public class MP3PlayListGUI extends JFrame {
 			// 리스트에 해당 뮤직 정보 추가
 			playListPanel.add(scrollPane, BorderLayout.CENTER);
 		}
-		add(playListPanel, BorderLayout.CENTER);		
+		add(playListPanel, BorderLayout.CENTER);
 	}
 
 	// IMG 화면 구현 (크기조절을 위해 Image변환 후 icon재설정)
@@ -181,8 +182,16 @@ public class MP3PlayListGUI extends JFrame {
 
 		Music music = new Music(mtitle, mautor, mlyricsPath, null, mfilePath, null);
 		music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
-		
+
 		mdao.insertMusicSql(music);
+		initPlayListGUI();
+	}
+
+	private void initPlayListGUI() {
+		remove(playListPanel);
+		init();
+		revalidate();
+		repaint();
 	}
 
 	// 노래시작버튼 클릭시 MP3PlayerGUI로 이동
@@ -205,6 +214,7 @@ public class MP3PlayListGUI extends JFrame {
 				try {
 					String[] split = e.getActionCommand().split("-");
 					mdao.deleteMusicSql(split[0], split[1]);
+					initPlayListGUI();
 				} catch (SQLException sqle) {
 					sqle.printStackTrace();
 				}
