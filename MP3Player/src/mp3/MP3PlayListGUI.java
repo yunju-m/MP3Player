@@ -50,7 +50,7 @@ public class MP3PlayListGUI extends JFrame {
 		try {
 			List<Music> musicList = mdao.getMusicList();
 			for (Music music : musicList) {
-				music.setMusicGenreList(mdao.getMusicGenreList(music.getMid()));
+				music.setMusicGenreList(mdao.getMusicGenreList());
 			}
 			showTopPenel();
 			showPlayListPanel(musicList);
@@ -94,9 +94,9 @@ public class MP3PlayListGUI extends JFrame {
 			musicContentPanel.setBorder(BorderFactory.createEmptyBorder(20 , 0 , 20 , 0));
 
 			playBtn = new JButton("재생");
-			playBtn.setActionCommand("" + music.getMid());
+			playBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
 			deleteBtn = new JButton("삭제");
-			deleteBtn.setActionCommand("" + music.getMid());
+			deleteBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
 
 			clickPlayMusicBtn();
 			clickDelMusicBtn();
@@ -179,12 +179,9 @@ public class MP3PlayListGUI extends JFrame {
 						"노래 추가 완료",
 						JOptionPane.INFORMATION_MESSAGE);
 
-		Music music = new Music(0, mtitle, mautor, mlyricsPath, null, mfilePath, null);
-		for (MusicGenre gen : genreList) {
-			if (gen.getMgtype().equals(genre)) {
-				music.setMusicGenreList(mdao.getMusicGenreList(gen.getMgid()));
-			}
-		}
+		Music music = new Music(mtitle, mautor, mlyricsPath, null, mfilePath, null);
+		music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
+		
 		mdao.insertMusicSql(music);
 	}
 
@@ -193,7 +190,8 @@ public class MP3PlayListGUI extends JFrame {
 		playBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new MP3PlayerGUI(Integer.parseInt(e.getActionCommand()));
+				String[] split = e.getActionCommand().split("-");
+				new MP3PlayerGUI(split[0], split[1]);
 				setVisible(false);
 			}
 		});
@@ -205,7 +203,8 @@ public class MP3PlayListGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					mdao.deleteMusicSql(Integer.parseInt(e.getActionCommand()));
+					String[] split = e.getActionCommand().split("-");
+					mdao.deleteMusicSql(split[0], split[1]);
 				} catch (SQLException sqle) {
 					sqle.printStackTrace();
 				}

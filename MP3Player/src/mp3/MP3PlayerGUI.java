@@ -51,11 +51,11 @@ public class MP3PlayerGUI extends JFrame {
 	private Clip clip;
 	private boolean isPlaying = false;
 
-	public MP3PlayerGUI(int mid) {
+	public MP3PlayerGUI(String mtitle, String mautor) {
 		try {
 			SwingUtilities.invokeLater(() -> setVisible(true));
 			mdao = new MP3Dao();
-			music = mdao.getMusic(mid);
+			music = mdao.getMusic(mtitle, mautor);
 			init();
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();

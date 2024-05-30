@@ -4,35 +4,25 @@ import java.util.List;
 
 public class Music {
 
-	private int mid;
 	private String mtitle;
 	private String mautor;
 	private String mlyrics;
 	private String mimg;
 	private String mfile;
 	private List<MusicGenre> musicGenreList;
-
+	
 	public Music() {
 	}
 
-	public Music(int mid, String mtitle, String mautor, String mlyrics, String mimg, String mfile,
+	public Music(String mtitle, String mautor, String mlyrics, String mimg, String mfile,
 			List<MusicGenre> musicGenreList) {
 		super();
-		this.mid = mid;
 		this.mtitle = mtitle;
 		this.mautor = mautor;
 		this.mlyrics = mlyrics;
 		this.mimg = mimg;
 		this.mfile = mfile;
 		this.musicGenreList = musicGenreList;
-	}
-
-	public int getMid() {
-		return mid;
-	}
-
-	public void setMid(int mid) {
-		this.mid = mid;
 	}
 
 	public String getMtitle() {
@@ -85,8 +75,8 @@ public class Music {
 
 	@Override
 	public String toString() {
-		return "Music [mid=" + mid + ", mtitle=" + mtitle + ", mautor=" + mautor + ", mlyrics=" + mlyrics + ", mimg="
-				+ mimg + ", mfile=" + mfile + ", musicGenreList=" + musicGenreList + "]";
+		return "Music [mtitle=" + mtitle + ", mautor=" + mautor + ", mlyrics=" + mlyrics + ", mimg=" + mimg + ", mfile="
+				+ mfile + ", musicGenreList=" + musicGenreList + "]";
 	}
 
 }
