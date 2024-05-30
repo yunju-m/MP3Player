@@ -17,6 +17,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
 public class MP3PlayListGUI extends JFrame {
@@ -25,6 +27,8 @@ public class MP3PlayListGUI extends JFrame {
 
 	MP3Dao mdao;
 	JPanel topPanel;
+	JPanel playListPanel;
+	JPanel playMusicPanel;
 	JButton addMusicBtn;
 	JButton playBtn;
 	JButton deleteBtn;
@@ -75,11 +79,11 @@ public class MP3PlayListGUI extends JFrame {
 
 	// 플레이리스트 출력 화면 생성 함수
 	private void showPlayListPanel(List<Music> musicList) throws SQLException {
-		JPanel playListPanel = new JPanel(new BorderLayout()); // 뮤직 리스트 화면
+		playListPanel = new JPanel(new BorderLayout()); // 뮤직 리스트 화면
 
 		// 뮤직 하나의 리스트 화면
 		// GridLayout(행, 열, 좌우간격, 상하간격)
-		JPanel playMusicPanel = new JPanel(new GridLayout(musicList.size(),4,3,3)); 
+		playMusicPanel = new JPanel(new GridLayout(musicList.size(),4,3,3)); 
 
 		for (Music music : musicList) {
 			JLabel musicTitle = new JLabel(music.getMtitle());
@@ -103,7 +107,11 @@ public class MP3PlayListGUI extends JFrame {
 			playMusicPanel.add(deleteBtn);
 
 			// 리스트에 해당 뮤직 정보 추가
-			playListPanel.add(playMusicPanel, BorderLayout.NORTH);
+			JScrollPane scrollPane = new JScrollPane(playMusicPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+			// 리스트에 해당 뮤직 정보 추가
+			playListPanel.add(scrollPane, BorderLayout.CENTER);
 		}
 		add(playListPanel, BorderLayout.CENTER);		
 	}
