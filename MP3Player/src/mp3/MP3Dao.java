@@ -1,32 +1,38 @@
 package mp3;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+
+import oracle.jdbc.OracleTypes;
 
 public class MP3Dao {
 
 	Connection conn;
 	Statement stmt;
 	PreparedStatement pstmt;
+	CallableStatement cstmt;
 	ResultSet rs;
 
 	public MP3Dao() {
 		conn = ConnectionUtil.getConnection();
 	}
 
-	// 전체 뮤직리스트 메소드
+	// 전체 뮤직리스트 반환 메소드
 	public List<Music> getMusicList() throws SQLException {
-		String sql = " SELECT * FROM MUSIC ";
-		stmt = conn.createStatement();
-		rs = stmt.executeQuery(sql);
+		String sql = " { call PROC_SELECT_MUSICLIST(?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.registerOutParameter(1, OracleTypes.CURSOR);
+		cstmt.execute();
 
 		List<Music> musicList = new ArrayList<Music>();
-
+		rs = (ResultSet)cstmt.getObject(1);
 		while (rs.next()) {
 			int mid = rs.getInt("MID");
 			Music music = new Music(mid, rs.getString("MTITLE"), rs.getString("MAUTOR"),
@@ -36,61 +42,72 @@ public class MP3Dao {
 		return musicList;
 	}
 
-	// 뮤직 장르 반환 메소드
-	public List<MusicGenre> getMusicGenreList() throws SQLException {
-		String sql = " SELECT * FROM MUSICGENRE ORDER BY MGID ";
-		stmt = conn.createStatement();
-		rs = stmt.executeQuery(sql);
-
-		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
-		while (rs.next()) {
-			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
-			mgtypeList.add(mgtype);
-		}
-		return mgtypeList;
-	}
-
-	// 뮤직 장르 반환 메소드 (mgid)
-	public List<MusicGenre> getMusicGenreList(int mgid) throws SQLException {
-		String sql = " SELECT * FROM MUSICGENRE WHERE MGID = ? ORDER BY MGID ";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, mgid);
-		rs = pstmt.executeQuery();
-
-		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
-		while (rs.next()) {
-			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
-			mgtypeList.add(mgtype);
-		}
-		return mgtypeList;
-	}
-
-	// 하나의 뮤직 반환 메소드
+	// 선택한 뮤직 정보 반환 메소드
 	public Music getMusic(int mid) throws SQLException {
-		String sql = " SELECT * FROM MUSIC WHERE MID = ? ";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, mid);
-		rs = pstmt.executeQuery();
+		String sql = " call PROC_SELECT_MUSIC(?, ?, ?, ?, ?, ?) ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.setInt(1, mid);
+		cstmt.registerOutParameter(1, Types.NUMERIC); // 노래번호
+		cstmt.registerOutParameter(2, Types.VARCHAR); // 노래제목
+		cstmt.registerOutParameter(3, Types.VARCHAR); // 노래작곡가
+		cstmt.registerOutParameter(4, Types.VARCHAR); // 노래가사
+		cstmt.registerOutParameter(5, Types.VARCHAR); // 노래이미지
+		cstmt.registerOutParameter(6, Types.VARCHAR); // 노래파일
+		cstmt.execute();
 
-		Music music = null;
-		if (rs.next()) {
-			music = new Music(rs.getInt("MID"), rs.getString("MTITLE"), rs.getString("MAUTOR"),
-					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), null);
-		}
+		Music music = new Music(cstmt.getInt(1),
+				cstmt.getString(2),
+				cstmt.getString(3),
+				cstmt.getString(4),
+				cstmt.getString(5),
+				cstmt.getString(6),
+				null);
 		return music;
+	}
+
+	// 전체 뮤직 장르 반환 메소드
+	public List<MusicGenre> getMusicGenreList() throws SQLException {
+		String sql = " { call PROC_SELECT_MUSICGENRELIST(?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.registerOutParameter(1, OracleTypes.CURSOR);
+		cstmt.execute();
+		rs = (ResultSet)cstmt.getObject(1);
+
+		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
+		while (rs.next()) {
+			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
+			mgtypeList.add(mgtype);
+		}
+		return mgtypeList;
+	}
+
+	// 선택한 뮤직 장르 정보 반환 메소드
+	public List<MusicGenre> getMusicGenreList(int mgid) throws SQLException {
+		String sql = " { call PROC_SELECT_MUSICGENRE(?, ?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.setInt(1, mgid);
+		cstmt.registerOutParameter(2, OracleTypes.CURSOR);
+		cstmt.execute();
+		List<MusicGenre> mgtypeList = new ArrayList<MusicGenre>();
+		rs = (ResultSet)cstmt.getObject(2);
+		while (rs.next()) {
+			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
+			mgtypeList.add(mgtype);
+		}
+		return mgtypeList;
 	}
 
 	// 새로운 뮤직 등록(제목, 작곡가, 음악파일, 음악가사) 메소드
 	public void insertMusicSql(Music music) throws SQLException {
-		String sql = " INSERT INTO MUSIC(mid, mtitle, mautor, mlyrics, mfile, mgid) VALUES(SEQ_MUSIC.NEXTVAL, ?, ?, ?, ?, ?) ";
-		pstmt = conn.prepareStatement(sql);
+		String sql = " { call PROC_INSERT_MUSIC(?, ?, ?, ?, ?) } ";
+		cstmt = conn.prepareCall(sql);
 		for (MusicGenre mgtype : music.getMusicGenreList()) {
-			pstmt.setString(1, music.getMtitle());
-			pstmt.setString(2, music.getMautor());
-			pstmt.setString(3, music.getMlyrics());
-			pstmt.setString(4, music.getMfile());
-			pstmt.setInt(5, mgtype.getMgid());
-			pstmt.executeQuery();
+			cstmt.setString(1, music.getMtitle());
+			cstmt.setString(2, music.getMautor());
+			cstmt.setString(3, music.getMlyrics());
+			cstmt.setString(4, music.getMfile());
+			cstmt.setInt(5, mgtype.getMgid());
+			cstmt.executeUpdate();
 		}
 	}
 
@@ -101,10 +118,10 @@ public class MP3Dao {
 
 	// 뮤직 삭제 메소드
 	public void deleteMusicSql(int mid) throws SQLException {
-		String sql = " DELETE FROM MUSIC WHERE MID = ? ";
-		pstmt = conn.prepareStatement(sql);
-		pstmt.setInt(1, mid);
-		pstmt.executeUpdate();
+		String sql = " { call PROC_DELETE_MUSIC(?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.setInt(1, mid);
+		cstmt.executeUpdate();
 	}
 
 }
