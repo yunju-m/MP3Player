@@ -2,6 +2,7 @@ package mp3;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -17,11 +18,14 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 public class MP3PlayListGUI extends JFrame {
 
@@ -31,16 +35,13 @@ public class MP3PlayListGUI extends JFrame {
 	JPanel topPanel;
 	JPanel playListPanel;
 	JPanel playMusicPanel;
+	JPanel musicItemPanel;
 	JButton addMusicBtn;
 	JButton playBtn;
 	JButton deleteBtn;
 	
-	Color backgroundColor = new Color(240, 240, 240); // 배경색
-	Color buttonColor = new Color(75, 75, 75); // 버튼 색깔
-	Color textColor = new Color(50, 50, 50); // 텍스트 색깔
-	Font textFont = new Font("Malgun Gothic", Font.BOLD, 30); // 텍스트 폰트 (글자체, 스타일, 크기)
-	Font buttonFont = new Font("Malgun Gothic", Font.BOLD, 15); // 버튼 텍스트 폰트
-
+	List<Music> musicList;
+	
 	public MP3PlayListGUI() {
 		mdao = new MP3Dao();
 		init();
@@ -56,12 +57,12 @@ public class MP3PlayListGUI extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		try {
-			List<Music> musicList = mdao.getMusicList();
+			musicList = mdao.getMusicList();
 			for (Music music : musicList) {
 				music.setMusicGenreList(mdao.getMusicGenreList());
 			}
 			showTopPenel();
-			showPlayListPanel(musicList);
+			showPlayListPanel();
 			clickAddMusicBtn();
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
@@ -69,42 +70,63 @@ public class MP3PlayListGUI extends JFrame {
 
 	}
 
-	// MyPlayList텍스트, 노래추가버튼 추가 함수
-	private void showTopPenel() {
-		JPanel topPanel = new JPanel(new BorderLayout());
-		
+	// topPanel 생성 함수
+	private void showTopPenel() throws SQLException {
+		topPanel = new JPanel(new BorderLayout());
+		topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 16));
+		showTitleAndBtn();
+		showMenuPanel();
+		add(topPanel, BorderLayout.NORTH);
+	}
+	
+	// 제목, 노래추가버튼 화면 생성 함수
+	private void showTitleAndBtn() {
+		JPanel titleAndBtnPanel = new JPanel(new BorderLayout()); 
+
 		// My PlayList 텍스트 화면 생성
 		JLabel title = new JLabel("My PlayList");
-		topPanel.add(title, BorderLayout.WEST);
+		titleAndBtnPanel.add(title, BorderLayout.WEST);
 		title.setFont(new Font("Malgun Gothic", Font.BOLD, 30));
 
 		// 노래 추가 버튼 생성
 		addMusicBtn = new CustomButton("노래추가");
 		addMusicBtn.setFont(new Font("Malgun Gothic", Font.BOLD, 15));
-		topPanel.add(addMusicBtn, BorderLayout.EAST);
-
-		// Frame에 topPanel 추가
-		topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 16));
-		add(topPanel, BorderLayout.NORTH);
+		titleAndBtnPanel.add(addMusicBtn, BorderLayout.EAST);
+		
+		topPanel.add(titleAndBtnPanel, BorderLayout.NORTH);
+	}
+	
+	// MyPlayList 메뉴바 생성 함수
+	private void showMenuPanel() throws SQLException {
+		JPanel menuPanel = new JPanel();
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.add(new JMenu("노래리스트"));
+		for (MusicGenre genre : mdao.getMusicGenreList()) {
+			menuBar.add(new JMenu((genre.getMgtype())));
+		}
+		menuPanel.add(menuBar);
+		topPanel.add(menuPanel, BorderLayout.SOUTH);
 	}
 
 	// 플레이리스트 출력 화면 생성 함수
-	private void showPlayListPanel(List<Music> musicList) throws SQLException {
+	private void showPlayListPanel() throws SQLException {
 		playListPanel = new JPanel(new BorderLayout()); // 뮤직 리스트 화면
 
 		// 뮤직 하나의 리스트 화면
 		// GridLayout(행, 열, 좌우간격, 상하간격)
-		playMusicPanel = new JPanel(new GridLayout(musicList.size(),4,3,3)); 
+		playMusicPanel = new JPanel(new GridLayout(musicList.size(),1,0,0)); 
 
 		for (Music music : musicList) {
+			musicItemPanel = new JPanel(new BorderLayout());
+			musicItemPanel.setBorder(BorderFactory.createEmptyBorder(0 , 10 , 0 , 0));
 			JLabel musicTitle = new JLabel(music.getMtitle());
 			JLabel musicAutor = new JLabel(music.getMautor());
 			JPanel musicContentPanel = new JPanel(new BorderLayout());
-			
+
 			musicTitle.setFont(new Font("Aharoni", Font.BOLD, 20));
 			musicAutor.setFont(new Font("Aharoni", Font.BOLD, 15));
 			musicAutor.setForeground(Color.GRAY);
-			
+
 			musicContentPanel.add(musicTitle, BorderLayout.NORTH);
 			musicContentPanel.add(musicAutor, BorderLayout.SOUTH);
 			musicContentPanel.setBorder(BorderFactory.createEmptyBorder(40 , 0 , 40 , 0));
@@ -121,15 +143,15 @@ public class MP3PlayListGUI extends JFrame {
 			deleteBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
 			buttonPanel.add(playBtn, BorderLayout.WEST);
 			buttonPanel.add(deleteBtn, BorderLayout.EAST);
-			
+
 			clickPlayMusicBtn();
 			clickDelMusicBtn();
 
-			playMusicPanel.add(getMusicImgLabel(music));
-			playMusicPanel.add(musicContentPanel);
-			playMusicPanel.add(buttonPanel);
+			musicItemPanel.add(getMusicImgLabel(music), BorderLayout.WEST);
+			musicItemPanel.add(musicContentPanel, BorderLayout.CENTER);
+			musicItemPanel.add(buttonPanel, BorderLayout.EAST);
+			playMusicPanel.add(musicItemPanel);
 
-			// 리스트에 해당 뮤직 정보 추가
 			JScrollPane scrollPane = new JScrollPane(playMusicPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
