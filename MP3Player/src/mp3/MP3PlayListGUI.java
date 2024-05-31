@@ -2,7 +2,6 @@ package mp3;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -25,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 
 public class MP3PlayListGUI extends JFrame {
 
@@ -39,9 +37,9 @@ public class MP3PlayListGUI extends JFrame {
 	JButton addMusicBtn;
 	JButton playBtn;
 	JButton deleteBtn;
-	
+
 	List<Music> musicList;
-	
+
 	public MP3PlayListGUI() {
 		mdao = new MP3Dao();
 		init();
@@ -78,7 +76,7 @@ public class MP3PlayListGUI extends JFrame {
 		showMenuPanel();
 		add(topPanel, BorderLayout.NORTH);
 	}
-	
+
 	// 제목, 노래추가버튼 화면 생성 함수
 	private void showTitleAndBtn() {
 		JPanel titleAndBtnPanel = new JPanel(new BorderLayout()); 
@@ -92,10 +90,10 @@ public class MP3PlayListGUI extends JFrame {
 		addMusicBtn = new CustomButton("노래추가");
 		addMusicBtn.setFont(new Font("Malgun Gothic", Font.BOLD, 15));
 		titleAndBtnPanel.add(addMusicBtn, BorderLayout.EAST);
-		
+
 		topPanel.add(titleAndBtnPanel, BorderLayout.NORTH);
 	}
-	
+
 	// MyPlayList 메뉴바 생성 함수
 	private void showMenuPanel() throws SQLException {
 		JPanel menuPanel = new JPanel();
@@ -112,53 +110,31 @@ public class MP3PlayListGUI extends JFrame {
 	private void showPlayListPanel() throws SQLException {
 		playListPanel = new JPanel(new BorderLayout()); // 뮤직 리스트 화면
 
-		// 뮤직 하나의 리스트 화면
-		// GridLayout(행, 열, 좌우간격, 상하간격)
+		// 하나의 뮤직 리스트 화면
 		playMusicPanel = new JPanel(new GridLayout(musicList.size(),1,0,0)); 
-
+		
 		for (Music music : musicList) {
 			musicItemPanel = new JPanel(new BorderLayout());
 			musicItemPanel.setBorder(BorderFactory.createEmptyBorder(0 , 10 , 0 , 0));
-			JLabel musicTitle = new JLabel(music.getMtitle());
-			JLabel musicAutor = new JLabel(music.getMautor());
-			JPanel musicContentPanel = new JPanel(new BorderLayout());
-
-			musicTitle.setFont(new Font("Aharoni", Font.BOLD, 20));
-			musicAutor.setFont(new Font("Aharoni", Font.BOLD, 15));
-			musicAutor.setForeground(Color.GRAY);
-
-			musicContentPanel.add(musicTitle, BorderLayout.NORTH);
-			musicContentPanel.add(musicAutor, BorderLayout.SOUTH);
-			musicContentPanel.setBorder(BorderFactory.createEmptyBorder(40 , 0 , 40 , 0));
-
-			JPanel buttonPanel = new JPanel(new BorderLayout());
-			buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 50, 20));
-			playBtn = new JButton("재생");
-			playBtn.setBackground(new Color(255, 204, 000));
-			playBtn.setForeground(Color.BLACK);
-			playBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
-			deleteBtn = new JButton("삭제");
-			deleteBtn.setBackground(new Color(204, 000, 000));
-			deleteBtn.setForeground(Color.BLACK);
-			deleteBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
-			buttonPanel.add(playBtn, BorderLayout.WEST);
-			buttonPanel.add(deleteBtn, BorderLayout.EAST);
+			
+			showMusicImgPanel(music);
+			showMusicContentPanel(music);
+			showButtonPanel(music);
 
 			clickPlayMusicBtn();
 			clickDelMusicBtn();
 
-			musicItemPanel.add(getMusicImgLabel(music), BorderLayout.WEST);
-			musicItemPanel.add(musicContentPanel, BorderLayout.CENTER);
-			musicItemPanel.add(buttonPanel, BorderLayout.EAST);
 			playMusicPanel.add(musicItemPanel);
-
 			JScrollPane scrollPane = new JScrollPane(playMusicPanel, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 					ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-			// 리스트에 해당 뮤직 정보 추가
 			playListPanel.add(scrollPane, BorderLayout.CENTER);
 		}
 		add(playListPanel, BorderLayout.CENTER);
+	}
+
+	// 노래 이미지 패널 생성
+	private void showMusicImgPanel(Music music) {
+		musicItemPanel.add(getMusicImgLabel(music), BorderLayout.WEST);
 	}
 
 	// IMG 화면 구현 (크기조절을 위해 Image변환 후 icon재설정)
@@ -170,6 +146,44 @@ public class MP3PlayListGUI extends JFrame {
 		JLabel lb1 = new JLabel(" ", JLabel.CENTER);
 		lb1.setIcon(changeIcon);
 		return lb1;
+	}
+
+	// 노래 제목, 작곡가가 들어있는 패널 생성
+	private void showMusicContentPanel(Music music) {
+		JLabel musicTitle = new JLabel(music.getMtitle());
+		JLabel musicAutor = new JLabel(music.getMautor());
+		JPanel musicContentPanel = new JPanel(new BorderLayout());
+
+		musicContentPanel.setBorder(BorderFactory.createEmptyBorder(40 , 0 , 40 , 0));
+		musicTitle.setFont(new Font("Aharoni", Font.BOLD, 20));
+		musicAutor.setFont(new Font("Aharoni", Font.BOLD, 15));
+		musicAutor.setForeground(Color.GRAY);
+
+		musicContentPanel.add(musicTitle, BorderLayout.NORTH);
+		musicContentPanel.add(musicAutor, BorderLayout.SOUTH);
+		musicItemPanel.add(musicContentPanel, BorderLayout.CENTER);
+	}
+
+	// 노래 재생, 삭제버튼 패널 생성
+	private void showButtonPanel(Music music) {
+		JPanel buttonPanel = new JPanel(new BorderLayout());
+		buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 0, 50, 20));
+
+		// 재생버튼 생성
+		playBtn = new JButton("재생");
+		playBtn.setBackground(new Color(255, 204, 000));
+		playBtn.setForeground(Color.BLACK);
+		playBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
+
+		//삭제버튼 생성
+		deleteBtn = new JButton("삭제");
+		deleteBtn.setBackground(new Color(204, 000, 000));
+		deleteBtn.setForeground(Color.BLACK);
+		deleteBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
+
+		buttonPanel.add(playBtn, BorderLayout.WEST);
+		buttonPanel.add(deleteBtn, BorderLayout.EAST);
+		musicItemPanel.add(buttonPanel, BorderLayout.EAST);
 	}
 
 	// 노래추가버튼 클릭시 노래 추가 카드 창 출력
