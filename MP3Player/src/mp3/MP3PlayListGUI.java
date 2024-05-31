@@ -11,6 +11,7 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.sound.sampled.Clip;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,14 +43,23 @@ public class MP3PlayListGUI extends JFrame {
 	JButton deleteBtn;
 
 	List<Music> musicList;
+	private boolean isPlaying = false;
+	private Clip clip;
 
 	public MP3PlayListGUI() {
 		mdao = new MP3Dao();
 		init();
 	}
 
+	public MP3PlayListGUI(boolean isPlaying, Clip clip) {
+		this.isPlaying = isPlaying;
+		this.clip = clip;
+		mdao = new MP3Dao();
+		init();
+	}
+
 	public void startMP3PlayListGUI() {
-		SwingUtilities.invokeLater(() -> new MP3PlayListGUI().setVisible(true));
+		SwingUtilities.invokeLater(() -> setVisible(true));
 	}
 
 	private void init() {
@@ -101,20 +111,20 @@ public class MP3PlayListGUI extends JFrame {
 	private void showMusicGenreListMenu() throws SQLException {
 		JPanel menuPanel = new JPanel(new BorderLayout());
 		List<MusicGenre> genreList = mdao.getMusicGenreList();
-		int genreListSize = genreList.size()+1;
+		int genreListSize = genreList.size() + 1;
 		String[] genreArr = new String[genreListSize];
 		genreArr[0] = "전체";
 		for (int i = 1; i < genreListSize; i++) {
-			genreArr[i] = genreList.get(i-1).getMgtype();
+			genreArr[i] = genreList.get(i - 1).getMgtype();
 		}
-		JList<String> genreJList = new JList<>(genreArr); 
+		JList<String> genreJList = new JList<>(genreArr);
 
 		// JList를 가로로 나타내기 위해 렌더러 설정
 		genreJList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-		genreJList.setVisibleRowCount(1); 
+		genreJList.setVisibleRowCount(1);
 
 		clickMusicGenreListMenu(genreJList);
-		menuPanel.add(genreJList); 
+		menuPanel.add(genreJList);
 		topPanel.add(menuPanel, BorderLayout.SOUTH);
 	}
 
@@ -126,8 +136,10 @@ public class MP3PlayListGUI extends JFrame {
 				String selectedGenre = genreJList.getSelectedValue();
 				if (selectedGenre != null) {
 					try {
-						if (selectedGenre.equals("전체")) musicList = mdao.getMusicList();
-						else musicList = mdao.getMusicGenreMusicList(selectedGenre);
+						if (selectedGenre.equals("전체"))
+							musicList = mdao.getMusicList();
+						else
+							musicList = mdao.getMusicGenreMusicList(selectedGenre);
 						initPlayListGUI();
 					} catch (Exception ex) {
 						ex.printStackTrace();
@@ -267,10 +279,10 @@ public class MP3PlayListGUI extends JFrame {
 			return;
 
 		JOptionPane
-		.showMessageDialog(
-				null, "노래 제목: " + mtitle + "\n" + "작곡가: " + mautor + "\n" + "음악 파일: " + mfile.getAbsolutePath()
-				+ "\n" + "음악 가사: " + mlyrics.getAbsolutePath(),
-				"노래 추가 완료", JOptionPane.INFORMATION_MESSAGE);
+				.showMessageDialog(
+						null, "노래 제목: " + mtitle + "\n" + "작곡가: " + mautor + "\n" + "음악 파일: " + mfile.getAbsolutePath()
+								+ "\n" + "음악 가사: " + mlyrics.getAbsolutePath(),
+						"노래 추가 완료", JOptionPane.INFORMATION_MESSAGE);
 
 		Music music = new Music(mtitle, mautor, mlyricsPath, null, mfilePath, null);
 		music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
@@ -289,7 +301,7 @@ public class MP3PlayListGUI extends JFrame {
 			showTopPenel();
 			showPlayListPanel();
 			clickAddMusicBtn();
-		}catch(SQLException sqle) {
+		} catch (SQLException sqle) {
 			sqle.printStackTrace();
 		}
 		revalidate();
@@ -302,7 +314,7 @@ public class MP3PlayListGUI extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String[] split = e.getActionCommand().split("-");
-				new MP3PlayerGUI(split[0], split[1]);
+				new MP3PlayerGUI(split[0], split[1], isPlaying, clip);
 				setVisible(false);
 			}
 		});

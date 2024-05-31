@@ -1,8 +1,6 @@
 package mp3;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -39,21 +37,16 @@ public class MP3PlayerGUI extends JFrame {
 	JButton stopButton;
 	JPanel centerPanel; // 노래 이미지, 가사 영역
 	JTextField lyricsField; // 가사 출력 영역
-
-	Color backgroundColor = new Color(240, 240, 240); // 배경색
-	Color buttonColor = new Color(75, 75, 75); // 버튼 색깔
-	Color textColor = new Color(50, 50, 50); // 텍스트 색깔
-	Font textFont = new Font("Malgun Gothic", Font.PLAIN, 20); // 텍스트 폰트 (글자체, 스타일, 크기)
-	Font buttonFont = new Font("Malgun Gothic", Font.BOLD, 12); // 버튼 텍스트 폰트
-
 	MP3Dao mdao;
 	Music music;
 	private Clip clip;
-	private boolean isPlaying = false;
+	private boolean isPlaying;
 
-	public MP3PlayerGUI(String mtitle, String mautor) {
+	public MP3PlayerGUI(String mtitle, String mautor, boolean isPlaying, Clip clip) {
 		try {
 			SwingUtilities.invokeLater(() -> setVisible(true));
+			this.isPlaying = isPlaying;
+			this.clip = clip;
 			mdao = new MP3Dao();
 			music = mdao.getMusic(mtitle, mautor);
 			init();
@@ -100,7 +93,7 @@ public class MP3PlayerGUI extends JFrame {
 		beforeBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				new MP3PlayListGUI().startMP3PlayListGUI();;
+				new MP3PlayListGUI(isPlaying, clip).startMP3PlayListGUI();
 				setVisible(false);
 			}
 		});
@@ -164,6 +157,12 @@ public class MP3PlayerGUI extends JFrame {
 			fnfe.printStackTrace();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
+		} finally {
+			try {
+				br.close();				
+			} catch (IOException ioe) {
+				ioe.printStackTrace();
+			}
 		}
 		return sb.toString();
 	}
@@ -173,6 +172,12 @@ public class MP3PlayerGUI extends JFrame {
 		playButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// 재생중이라면 다시 재생 시작
+				if(isPlaying) {
+					isPlaying = false;
+					clip.stop();
+					clip.close();
+				}
 				if (!isPlaying) {
 					try {
 						FileInputStream fileInputStream = new FileInputStream(music.getMfile());
