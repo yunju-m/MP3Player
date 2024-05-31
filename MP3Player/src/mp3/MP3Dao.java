@@ -85,7 +85,7 @@ public class MP3Dao {
 		return genreByMusicList;
 	}
 
-	// 전체 뮤직 장르 반환 메소드
+	// 전체 뮤직 장르 반환 메소드1
 	public List<MusicGenre> getMusicGenreList() throws SQLException {
 		String sql = " { call PROC_SELECT_MUSICGENRELIST(?) } ";
 		cstmt = conn.prepareCall(sql);
@@ -102,7 +102,21 @@ public class MP3Dao {
 		return mgtypeList;
 	}
 
-	// 선택한 뮤직 장르 정보 반환 메소드
+	// 선택한 뮤직 장르 정보 반환 메소드2 (장르종류로 검색)
+	public MusicGenre getMusicGenreList(String mgenre) throws SQLException {
+		String sql = " { call PROC_SELECT_MUSICGENRE_PK(?, ?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.setString(1, mgenre);		
+		cstmt.registerOutParameter(1, Types.VARCHAR); // 노래 장르
+		cstmt.registerOutParameter(2, Types.NUMERIC); // 장르 번호
+		cstmt.execute();
+
+		MusicGenre mgtype = new MusicGenre(cstmt.getInt(2), cstmt.getString(1));	
+		cstmt.close();
+		return mgtype;
+	}
+
+	// 선택한 뮤직 장르 정보 반환 메소드3 (가사이름, 작곡가 검색)
 	public List<MusicGenre> getMusicGenreList(String mtitle, String mautor) throws SQLException {
 		String sql = " { call PROC_SELECT_MUSICGENRE(?, ?, ?) } ";
 		cstmt = conn.prepareCall(sql);
@@ -132,6 +146,19 @@ public class MP3Dao {
 		cstmt.close();
 	}
 
+	// 새로운 뮤직을 장르에 맞춰서 뮤직리스트에 등록 메소드
+	public void insertMusicListSql(Music music) throws SQLException {
+		String sql = " { call PROC_INSERT_MUSICLIST(?, ?, ? ) } ";
+		cstmt = conn.prepareCall(sql);
+		for (MusicGenre mg : music.getMusicGenreList()) {
+			cstmt.setInt(1, mg.getMgid());
+			cstmt.setString(2, music.getMtitle());
+			cstmt.setString(3, music.getMautor());
+			cstmt.executeUpdate();	
+		}
+		cstmt.close();
+	}
+
 	// 뮤직 업데이트 메소드
 	public void updateMusicSql(Music mp3) throws SQLException {
 		// 관심 플레이리스트 등록 구현
@@ -143,6 +170,17 @@ public class MP3Dao {
 		cstmt = conn.prepareCall(sql);
 		cstmt.setString(1, mtitle);
 		cstmt.setString(2, mautor);
+		cstmt.executeUpdate();
+		cstmt.close();
+	}
+
+	// 뮤직장르별 뮤직 삭제 메소드
+	public void deleteMusicListSql(int mgid, String mtitle, String mautor) throws SQLException {
+		String sql = " { call PROC_DELETE_MUSICLIST(?, ?, ?) } ";
+		cstmt = conn.prepareCall(sql);		
+		cstmt.setInt(1, mgid);
+		cstmt.setString(2, mtitle);
+		cstmt.setString(3, mautor);
 		cstmt.executeUpdate();
 		cstmt.close();
 	}

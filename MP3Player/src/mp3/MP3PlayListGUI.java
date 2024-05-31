@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.sampled.Clip;
@@ -70,7 +71,7 @@ public class MP3PlayListGUI extends JFrame {
 		try {
 			musicList = mdao.getMusicList();
 			for (Music music : musicList) {
-				music.setMusicGenreList(mdao.getMusicGenreList());
+				music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
 			}
 			showTopPenel();
 			showPlayListPanel();
@@ -222,7 +223,7 @@ public class MP3PlayListGUI extends JFrame {
 		deleteBtn = new JButton("삭제");
 		deleteBtn.setBackground(new Color(204, 000, 000));
 		deleteBtn.setForeground(Color.BLACK);
-		deleteBtn.setActionCommand(music.getMtitle() + "-" + music.getMautor());
+		deleteBtn.setActionCommand(music.getMusicGenreList().get(0).getMgid() + "-" + music.getMtitle() + "-" + music.getMautor());
 
 		buttonPanel.add(playBtn, BorderLayout.WEST);
 		buttonPanel.add(deleteBtn, BorderLayout.EAST);
@@ -279,15 +280,20 @@ public class MP3PlayListGUI extends JFrame {
 			return;
 
 		JOptionPane
-				.showMessageDialog(
-						null, "노래 제목: " + mtitle + "\n" + "작곡가: " + mautor + "\n" + "음악 파일: " + mfile.getAbsolutePath()
-								+ "\n" + "음악 가사: " + mlyrics.getAbsolutePath(),
-						"노래 추가 완료", JOptionPane.INFORMATION_MESSAGE);
+		.showMessageDialog(
+				null, "노래 제목: " + mtitle + "\n" + "작곡가: " + mautor + "\n" + "음악 파일: " + mfile.getAbsolutePath()
+				+ "\n" + "음악 가사: " + mlyrics.getAbsolutePath(),
+				"노래 추가 완료", JOptionPane.INFORMATION_MESSAGE);
 
 		Music music = new Music(mtitle, mautor, mlyricsPath, null, mfilePath, null);
-		music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
+		MusicGenre mg = mdao.getMusicGenreList(genre);
+		List<MusicGenre> mgList = new ArrayList<>();
+		mgList.add(mg);
+		music.setMusicGenreList(mgList);
 
 		mdao.insertMusicSql(music);
+		mdao.insertMusicListSql(music);
+
 		musicList = mdao.getMusicList();
 		initPlayListGUI();
 	}
@@ -296,7 +302,7 @@ public class MP3PlayListGUI extends JFrame {
 		remove(playListPanel);
 		try {
 			for (Music music : musicList) {
-				music.setMusicGenreList(mdao.getMusicGenreList());
+				music.setMusicGenreList(mdao.getMusicGenreList(music.getMtitle(), music.getMautor()));
 			}
 			showTopPenel();
 			showPlayListPanel();
@@ -327,7 +333,13 @@ public class MP3PlayListGUI extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					String[] split = e.getActionCommand().split("-");
-					mdao.deleteMusicSql(split[0], split[1]);
+					int mgid = Integer.parseInt(split[0]);
+					String mtitle = split[1];
+					String mautor = split[2];
+
+					mdao.deleteMusicListSql(mgid, mtitle, mautor);
+					musicList = mdao.getMusicList();
+					mdao.deleteMusicSql(mtitle, mautor);
 					musicList = mdao.getMusicList();
 					initPlayListGUI();
 				} catch (SQLException sqle) {
