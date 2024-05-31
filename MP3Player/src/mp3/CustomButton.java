@@ -7,7 +7,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 
 public class CustomButton extends JButton {
-
+	private static final long serialVersionUID = 1149142184718947147L;
+	
     public CustomButton(String text) {
         super(text);
         setOpaque(true);

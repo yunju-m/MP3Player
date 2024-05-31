@@ -38,6 +38,7 @@ public class MP3Dao {
 					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), null);
 			musicList.add(music);
 		}
+		cstmt.close();
 		return musicList;
 	}
 
@@ -61,7 +62,27 @@ public class MP3Dao {
 				cstmt.getString(4),
 				cstmt.getString(5),
 				null);
+		cstmt.close();
 		return music;
+	}
+
+	// 선택한 장르에 뮤직리스트 반환 메소드
+	public List<Music> getMusicGenreMusicList(String genre) throws SQLException {
+		String sql = " { call PROC_SELECT_GENRE_BY_MUSICLIST(?, ?) } ";
+		cstmt = conn.prepareCall(sql);
+		cstmt.setString(1, genre);
+		cstmt.registerOutParameter(2, OracleTypes.CURSOR);
+		cstmt.execute();
+		rs = (ResultSet)cstmt.getObject(2);
+
+		List<Music> genreByMusicList = new ArrayList<Music>();
+		while (rs.next()) {
+			Music music = new Music(rs.getString("MTITLE"), rs.getString("MAUTOR"),
+					rs.getString("MLYRICS"), rs.getString("MIMG"), rs.getString("MFILE"), null);
+			genreByMusicList.add(music);
+		}
+		cstmt.close();
+		return genreByMusicList;
 	}
 
 	// 전체 뮤직 장르 반환 메소드
@@ -77,6 +98,7 @@ public class MP3Dao {
 			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
 			mgtypeList.add(mgtype);
 		}
+		cstmt.close();
 		return mgtypeList;
 	}
 
@@ -94,6 +116,7 @@ public class MP3Dao {
 			MusicGenre mgtype = new MusicGenre(rs.getInt("MGID"), rs.getString("MGTYPE"));
 			mgtypeList.add(mgtype);
 		}
+		cstmt.close();
 		return mgtypeList;
 	}
 
@@ -106,6 +129,7 @@ public class MP3Dao {
 		cstmt.setString(3, music.getMlyrics());
 		cstmt.setString(4, music.getMfile());
 		cstmt.executeUpdate();
+		cstmt.close();
 	}
 
 	// 뮤직 업데이트 메소드
@@ -120,6 +144,7 @@ public class MP3Dao {
 		cstmt.setString(1, mtitle);
 		cstmt.setString(2, mautor);
 		cstmt.executeUpdate();
+		cstmt.close();
 	}
 
 }
