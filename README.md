@@ -33,18 +33,18 @@ javax.sound 패키지를 이용해서 MP3 GUI를 구현해본다.
 6-3. 노래가 진행된 상태에서 새로운 노래를 시작하면 그 노래가 재생된다.
 ```
 
-### 디자인 설계
-## 화면 구성 📺
+## 디자인 설계
+### 화면 구성 📺
 | 화면 디자인 설계 |
 | :----------: |
 |![image](https://github.com/yunju-m/MP3Player/assets/74498379/26568f87-9784-4696-a7dd-f806b7c5de00)|
 
-## 화면 레이아웃 설계 
+### 화면 레이아웃 설계 
 | MP3PlayListGUI 화면 | MP3PlayerGUI 화면 |
 | :----------: | :----------: |
 | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/6178224c-709c-4a49-84f5-ec4f5a818e4f) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/7f17c56b-f0eb-480e-853a-5d3a32f29f2d) |
 
-## ER다이어그램 설계
+### ER다이어그램 설계
 | 논리적모델링 | 물리적모델링 |
 | :----------: | :----------: |
 | ![논리적모델링](https://github.com/yunju-m/MP3Player/assets/74498379/c2a048a1-4e25-4f5d-a05f-c7d83ea946df) | ![물리적모델링](https://github.com/yunju-m/MP3Player/assets/74498379/25c2f632-74a9-419a-8a4b-039a00d289fa) |
@@ -159,3 +159,16 @@ MP3PlayerGUI
 MP3Main
 	- [X] MP3PlayListGUI 함수 호출
 ```
+
+## 결과
+| MP3PlayListGUI 화면 | MP3PlayerGUI 화면 | 노래추가버튼 결과 화면 | 노래삭제버튼 결과 화면 |
+| :----------: | :----------: | :----------: | :----------: |
+| ![image](https://github.com/yunju-m/MP3Player/assets/74498379/447f7903-1fa5-47e8-8a42-25fdfc1bc0ef) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/29f2e8b5-1b33-4e28-bb72-f118e599b689) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/adb31eb5-2b5c-45a6-9a36-b5cdc1fdbca7) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/73262a9d-4f91-4800-b06e-f4e2fb41f434) |
+
+### 노래추가 과정
+| 노래제목입력 | 노래작곡가입력 | 노래파일입력 | 노래가사입력 | 노래장르선택 | 결과창출력 |
+| :----------: | :----------: | :----------: | :----------: |  :----------: | :----------: |
+| ![image](https://github.com/yunju-m/MP3Player/assets/74498379/5358d2e1-5f66-4df4-894e-842f38abb644) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/663e1676-7ee6-4e5a-b537-78b39312ed07) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/df61104a-a687-4da1-8db7-b9444b861aa4) |![image](https://github.com/yunju-m/MP3Player/assets/74498379/13e91dab-8db2-4a2e-a8c1-d8018ca6050b) | ![스크린샷(18)](https://github.com/yunju-m/MP3Player/assets/74498379/89150f17-bf34-43b4-98ad-aa27a8ac7ce2) | ![image](https://github.com/yunju-m/MP3Player/assets/74498379/df2aa2e9-bb0f-47d6-979c-569f22b78bc4) |
+
+
+
